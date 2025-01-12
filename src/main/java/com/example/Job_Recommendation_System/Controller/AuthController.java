@@ -1,5 +1,7 @@
 package com.example.Job_Recommendation_System.Controller;
 
+import com.example.Job_Recommendation_System.Config.JwtAuthenticationFilter;
+import com.example.Job_Recommendation_System.Dto.ChangePasswordRequest;
 import com.example.Job_Recommendation_System.Dto.LoginRequest;
 import com.example.Job_Recommendation_System.Dto.LoginResponse;
 import com.example.Job_Recommendation_System.Entity.Users;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -35,6 +38,8 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JWTService jwtService;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody Users user) {
@@ -93,9 +98,43 @@ public class AuthController {
         return ResponseEntity.ok("Logged out successfully.");
     }
 
+    @PostMapping("/change-password")
+    public String changePassword(@RequestBody ChangePasswordRequest request, @RequestHeader("Authorization") String authHeader) {
+        try {
+            // Extract token from Authorization header
+            String token = authHeader.substring(7);
 
+            // Use the extractEmail method to get the email
+            String userEmail = jwtAuthenticationFilter.extractEmail(token);
 
+            // Find the user by email
+            Optional<Users> userOptional = userRepository.findByEmail(userEmail);
+            if (userOptional.isEmpty()) {
+                return "User not found.";
+            }
 
+            Users user = userOptional.get();
+
+            // Validate old password
+            if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+                return "Old password is incorrect.";
+            }
+
+            // Check new password and confirm password match
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                return "New password and confirm password do not match.";
+            }
+
+            // Update the password
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+
+            return "Password changed successfully.";
+        } catch (Exception e) {
+            // Handle any token parsing or other exceptions
+            return "Invalid token or unauthorized request.";
+        }
+    }
 
 
 }

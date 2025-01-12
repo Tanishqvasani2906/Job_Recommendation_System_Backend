@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String extractEmail(String token) {
+    public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
 
