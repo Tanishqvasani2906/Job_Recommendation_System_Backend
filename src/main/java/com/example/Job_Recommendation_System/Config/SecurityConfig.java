@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/userlogin/login", "/userlogin/register" , "/userlogin/logout").permitAll()
-                        .requestMatchers("/userlogin/change-password").permitAll()
+                        .requestMatchers("/userlogin/change-password","/userlogin/forgot-password","/userlogin/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

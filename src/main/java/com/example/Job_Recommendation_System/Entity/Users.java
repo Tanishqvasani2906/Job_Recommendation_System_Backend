@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
@@ -120,6 +122,28 @@ public class Users {
     private String gender;
     @Column(name = "resumeUrl" , nullable = false , unique = true)
     private String resumeUrl;
+
+    @Column(name = "temp_token")
+    private String tempToken;
+
+    public LocalDateTime getTempTokenExpiry() {
+        return tempTokenExpiry;
+    }
+
+    public void setTempTokenExpiry(LocalDateTime tempTokenExpiry) {
+        this.tempTokenExpiry = tempTokenExpiry;
+    }
+
+    public String getTempToken() {
+        return tempToken;
+    }
+
+    public void setTempToken(String tempToken) {
+        this.tempToken = tempToken;
+    }
+
+    @Column(name = "temp_token_expiry")
+    private LocalDateTime tempTokenExpiry;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "roles", nullable = false)

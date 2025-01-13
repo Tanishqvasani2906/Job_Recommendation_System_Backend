@@ -7,6 +7,7 @@ import com.example.Job_Recommendation_System.Dto.LoginResponse;
 import com.example.Job_Recommendation_System.Entity.Users;
 import com.example.Job_Recommendation_System.Repository.UserRepo;
 import com.example.Job_Recommendation_System.Service.JWTService;
+import com.example.Job_Recommendation_System.Service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,6 +42,8 @@ public class AuthController {
     private JWTService jwtService;
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody Users user) {
@@ -135,6 +139,43 @@ public class AuthController {
             return "Invalid token or unauthorized request.";
         }
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> requestTempToken(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.substring(7);
+            String userEmail = jwtAuthenticationFilter.extractEmail(token);
+            String tempToken = userService.generateTempToken(userEmail);
+            Optional<Users> userOptional = userRepository.findByEmail(userEmail);
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.badRequest().body("User not found.");
+            }
+            Users user = userOptional.get();
+            return ResponseEntity.ok(Map.of(
+                    "user_id", user.getUser_id(),
+                    "temp_token", tempToken
+            ));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String userId = request.get("user_id");
+        String tempToken = request.get("temp_token");
+        String newPassword = request.get("new_password");
+
+        try {
+            userService.resetPassword(userId, tempToken, newPassword);
+            return ResponseEntity.ok("Password reset successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+
 
 
 }
