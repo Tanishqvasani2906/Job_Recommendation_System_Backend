@@ -141,39 +141,37 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> requestTempToken(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> requestTempToken(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
         try {
-            String token = authHeader.substring(7);
-            String userEmail = jwtAuthenticationFilter.extractEmail(token);
-            String tempToken = userService.generateTempToken(userEmail);
-            Optional<Users> userOptional = userRepository.findByEmail(userEmail);
-            if (userOptional.isEmpty()) {
-                return ResponseEntity.badRequest().body("User not found.");
-            }
-            Users user = userOptional.get();
-            return ResponseEntity.ok(Map.of(
-                    "user_id", user.getUser_id(),
-                    "temp_token", tempToken
-            ));
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
-
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
-        String userId = request.get("user_id");
-        String tempToken = request.get("temp_token");
-        String newPassword = request.get("new_password");
-
-        try {
-            userService.resetPassword(userId, tempToken, newPassword);
-            return ResponseEntity.ok("Password reset successfully");
+            userService.generateTempToken(email);
+            return ResponseEntity.ok("Password reset link sent to your email.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
+
+    @PostMapping("/reset-password/{user_id}/{temp_token}")
+    public ResponseEntity<?> resetPassword(
+            @PathVariable String user_id,       // Receive user_id from path variable
+            @PathVariable String temp_token,    // Receive temp_token from path variable
+            @RequestBody Map<String, String> request) {  // Receive new password in the request body
+
+        String newPassword = request.get("new_password");
+
+        try {
+            boolean resetSuccessful = userService.resetPassword(user_id, temp_token, newPassword);
+            if (resetSuccessful) {
+                return ResponseEntity.ok("Password has been reset successfully.");
+            } else {
+                return ResponseEntity.badRequest().body("Error: Invalid user ID or token.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
 
 
 
