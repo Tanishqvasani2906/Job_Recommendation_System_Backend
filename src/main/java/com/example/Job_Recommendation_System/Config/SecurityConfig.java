@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -35,9 +36,14 @@ public class SecurityConfig {
 //               FOR THE GOOGLE AUTH BELOW 4 LINES OF CODE
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/google") // Redirect to Google login page
-                        .defaultSuccessUrl("https://careervistaa.vercel.app/", true) // Post-login success URL
-                        .failureUrl("/login?error=true") // Redirect in case of failure
+                        .defaultSuccessUrl("/oauth2/callback/google", true) // Success redirect
+                        .failureUrl("/login?error=true") // Failure redirect
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorization")
+                                .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
+                        )
                 )
+
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
