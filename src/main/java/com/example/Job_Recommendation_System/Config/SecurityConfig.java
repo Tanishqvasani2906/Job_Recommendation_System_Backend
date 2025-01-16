@@ -35,7 +35,7 @@ public class SecurityConfig {
 //               FOR THE GOOGLE AUTH BELOW 4 LINES OF CODE
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/google") // Redirect to Google login page
-                        .defaultSuccessUrl("/oauth2/callback/google", true) // Post-login success URL
+                        .defaultSuccessUrl("/dashboard", true) // Post-login success URL
                         .failureUrl("/login?error=true") // Redirect in case of failure
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
