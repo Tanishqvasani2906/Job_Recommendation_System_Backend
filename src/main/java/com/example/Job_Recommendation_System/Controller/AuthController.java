@@ -12,6 +12,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.security.SignatureException;
 import java.util.HashSet;
 import java.util.Map;
@@ -172,6 +174,11 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/login/google")
+    public void googleLogin(HttpServletResponse response) throws IOException {
+        // Redirect to the Google login page
+        response.sendRedirect("/oauth2/authorization/google");
+    }
 
 
 

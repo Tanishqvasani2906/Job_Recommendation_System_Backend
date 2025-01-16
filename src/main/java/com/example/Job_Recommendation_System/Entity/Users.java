@@ -106,7 +106,7 @@ public class Users {
     private String user_id;
     @Column(name = "username" , nullable = false, unique = true)
     private String username;
-    @Column(name = "password" , nullable = false , unique = true)
+    @Column(name = "password" , nullable = true , unique = true)
     private String password;
     @Column(name = "first_name" , nullable = false)
     private String firstName;
@@ -120,7 +120,7 @@ public class Users {
     private String address;
     @Column(name = "gender")
     private String gender;
-    @Column(name = "resumeUrl" , nullable = false , unique = true)
+    @Column(name = "resumeUrl" , nullable = true , unique = true)
     private String resumeUrl;
 
     @Column(name = "temp_token")
