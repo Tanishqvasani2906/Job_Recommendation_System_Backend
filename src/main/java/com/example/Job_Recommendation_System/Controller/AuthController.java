@@ -180,6 +180,12 @@ public class AuthController {
         response.sendRedirect("/oauth2/authorization/google");
     }
 
+    @GetMapping("/oauth2/callback/google")
+    public String oauth2Callback(@RequestParam String code) {
+        // Handle the callback, exchange code for token, and fetch user data
+        // Then authenticate or store the user's info
+        return "redirect:/home";  // Redirect to a home or dashboard page after successful login
+    }
 
 
 
