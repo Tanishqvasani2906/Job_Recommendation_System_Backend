@@ -36,7 +36,7 @@ public class SecurityConfig {
 //               FOR THE GOOGLE AUTH BELOW 4 LINES OF CODE
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/oauth2/authorization/google") // Redirect to Google login page
-                        .defaultSuccessUrl("/oauth2/callback/google", true) // Success redirect
+                        .defaultSuccessUrl("https://careervistaa.vercel.app/", true) // Success redirect
                         .failureUrl("/login?error=true") // Failure redirect
                         .authorizationEndpoint(authorization -> authorization
                                 .baseUri("/oauth2/authorization")
