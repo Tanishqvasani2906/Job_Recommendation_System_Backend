@@ -37,18 +37,28 @@ public class JobUpdateService {
                 Jobs job = new Jobs();
                 job.setTitle(jobNode.get("title").asText());
                 job.setCompany(jobNode.get("company_name").asText());
-                job.setUrl(jobNode.get("url").asText());
+                job.setUrl(jobNode.get("url").asText());  // Use URL or any other unique field
                 job.setTags(jobNode.get("tags").toString());
                 job.setDescription(jobNode.get("description").asText());
                 job.setCategory(jobNode.get("category").asText());
                 job.setUpdatedAt(LocalDateTime.now());
-                jobList.add(job);
+
+                // Check if job with this URL already exists in the DB
+                Jobs existingJob = jobRepo.findByUrl(job.getUrl());  // Fetch job by URL
+                if (existingJob == null) {  // If no job with the same URL exists
+                    jobList.add(job);  // Add only new jobs
+                }
             }
-            jobRepo.saveAll(jobList);
+
+            if (!jobList.isEmpty()) {
+                jobRepo.saveAll(jobList);  // Insert only new jobs
+            }
         } catch (Exception e) {
             System.err.println("Failed to update jobs: " + e.getMessage());
         }
     }
+
+
 
     @Transactional
     public void insertJobs(List<Jobs> jobs) {

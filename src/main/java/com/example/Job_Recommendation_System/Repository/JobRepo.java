@@ -13,4 +13,5 @@ import java.time.LocalDateTime;
 @Repository
 public interface JobRepo extends JpaRepository<Jobs, String> {
 
+    Jobs findByUrl(String url);
 }
