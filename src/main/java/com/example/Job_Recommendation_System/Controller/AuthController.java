@@ -181,11 +181,11 @@ public class AuthController {
     }
 
     @GetMapping("/oauth2/callback/google")
-    public String oauth2Callback(@RequestParam String code) {
-        // Handle the callback, exchange code for token, and fetch user data
-        // Then authenticate or store the user's info
-        return "redirect:/home";  // Redirect to a home or dashboard page after successful login
+    public ResponseEntity<String> handleGoogleCallback(@RequestParam("code") String code) {
+        System.out.println("Authorization code received: " + code);
+        return ResponseEntity.ok("Authorization code received");
     }
+
 
 
 
