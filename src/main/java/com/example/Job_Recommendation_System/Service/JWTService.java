@@ -1,10 +1,13 @@
+
 package com.example.Job_Recommendation_System.Service;
 
 
+import com.example.Job_Recommendation_System.Entity.Users;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class JWTService {
@@ -13,20 +16,20 @@ public class JWTService {
     private static final long EXPIRATION_TIME = 84 * 24 * 60 * 60 * 1000L; // 84 days in milliseconds
 
     // Generate a JWT token
-    public String generateToken(String userId, String role, String email) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("user_id", userId);
-        claims.put("role", role);
-        claims.put("email", email);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
-    }
+//    public String generateToken(String userId, String role, String email) {
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("user_id", userId);
+//        claims.put("role", role);
+//        claims.put("email", email);
+//
+//        return Jwts.builder()
+//                .setClaims(claims)
+//                .setSubject(email)
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+//                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+//                .compact();
+//    }
 
     // Validate the JWT token
 //    public boolean validateToken(String token) {
@@ -38,90 +41,89 @@ public class JWTService {
 //        }
 //    }
 
+    private Map<String, Date> blacklistedTokens = new ConcurrentHashMap<>();
+
+    public String generateToken(Users user) {
+        Map<String, Object> claims = new HashMap<>();
+        // Store the raw role name without 'ROLE_' prefix
+        claims.put("roles", user.getRole().name());  // "COMPANY" or "ADMIN"
+        claims.put("user_id", user.getUser_id());
+        claims.put("email", user.getEmail());
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(user.getEmail()) // Subject as the email
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY.getBytes())
+                .compact();
+    }
+
     public boolean validateToken(String token) {
         try {
-            // Preprocess the token to fix any URL-safe Base64 issues
-            String fixedToken = token.replace('-', '+').replace('_', '/');
-
-            // Add padding if necessary
-            int missingPadding = 4 - (fixedToken.length() % 4);
-            if (missingPadding > 0 && missingPadding < 4) {
-                fixedToken += "=".repeat(missingPadding);
-            }
-
-            // Parse the token (replace `secretKey` with your actual secret key)
-            Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(fixedToken);
-
-            return true; // Token is valid
+            return !isTokenExpired(token);
         } catch (Exception e) {
             System.err.println("Error during token validation: " + e.getMessage());
-            return false; // Token is invalid
+            return false;
         }
     }
 
-
-
-    // Method to extract the email from the token
-    private String extractEmail(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY.getBytes())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject(); // Assuming the subject is the email
+    public String extractEmail(String token) {
+        return extractClaims(token).getSubject();
     }
 
-    // Method to check if the token is expired
-    private boolean isTokenExpired(String token) {
-        Date expirationDate = extractExpiration(token);
-        return expirationDate.before(new Date());
-    }
-
-    // Method to extract the expiration date from the token
-    private Date extractExpiration(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY.getBytes())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
-    }
-
-    // Extract claims from the token
-//    private Claims extractClaims(String token) {
-//        return Jwts.parser()
-//                .setSigningKey(SECRET_KEY)
-//                .parseClaimsJws(token)
-//                .getBody();
-//    }
-    public Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    // Extract user_id from the token
     public String extractUserId(String token) {
         return extractClaims(token).get("user_id", String.class);
     }
 
-    // Extract role from the token
     public String extractRole(String token) {
-        return extractClaims(token).get("role", String.class);
+        // Extract the raw role (e.g., "COMPANY", "ADMIN")
+        return extractClaims(token).get("roles", String.class);
     }
-    private Set<String> blacklistedTokens = new HashSet<>();
 
-    // Add the token to the blacklist
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaims(token).getExpiration();
+    }
+
+    public Claims extractClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY.getBytes())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            throw new IllegalArgumentException("Invalid JWT signature: " + e.getMessage(), e);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new IllegalArgumentException("JWT token is expired: " + e.getMessage(), e);
+        } catch (io.jsonwebtoken.MalformedJwtException e) {
+            throw new IllegalArgumentException("Malformed JWT token: " + e.getMessage(), e);
+        } catch (io.jsonwebtoken.UnsupportedJwtException e) {
+            throw new IllegalArgumentException("Unsupported JWT token: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error parsing JWT token: " + e.getMessage(), e);
+        }
+    }
+
     public void blacklistToken(String token) {
-        blacklistedTokens.add(token);
+        Date expiration = extractExpiration(token);
+        blacklistedTokens.put(token, expiration);
     }
 
-    // Check if the token is blacklisted
     public boolean isTokenBlacklisted(String token) {
-        return blacklistedTokens.contains(token);
+        Date expiration = blacklistedTokens.get(token);
+        if (expiration != null) {
+            if (expiration.before(new Date())) {
+                blacklistedTokens.remove(token);
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
+
 }

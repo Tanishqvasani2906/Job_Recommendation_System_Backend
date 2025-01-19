@@ -76,20 +76,13 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(), loginRequest.getPassword())
         );
 
-        // Extract details from the Authentication object
-        String userId = user.getUser_id().toString(); // Assuming `Users` entity has a `user_id` field
-        String role = authentication.getAuthorities().stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Role not found"))
-                .getAuthority(); // Assuming role is in authorities
-        String email = user.getEmail(); // Assuming `Users` entity has an `email` field
-
         // Generate JWT token using JWTService
-        String jwtToken = jwtService.generateToken(userId, role, email);
+        String jwtToken = jwtService.generateToken(user);
 
         // Return the token and user ID in the response
         return ResponseEntity.ok(new LoginResponse(jwtToken, user.getUser_id()));
     }
+
 
     private final Set<String> blacklistedTokens = new HashSet<>();
     @PostMapping("/logout")
