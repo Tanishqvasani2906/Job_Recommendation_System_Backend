@@ -104,17 +104,17 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String user_id;
-    @Column(name = "username" , nullable = false, unique = true)
+    @Column(name = "username" , nullable = true, unique = true)
     private String username;
     @Column(name = "password" , nullable = true , unique = true)
     private String password;
     @Column(name = "first_name" , nullable = false)
     private String firstName;
-    @Column(name = "last_name" , nullable = false)
+    @Column(name = "last_name" , nullable = true)
     private String lastName;
     @Column(name = "email" , nullable = false , unique = true)
     private String email;
-    @Column(name = "phone" , nullable = false , unique = true)
+    @Column(name = "phone" , nullable = true , unique = true)
     private String phone;
     @Column(name = "address")
     private String address;

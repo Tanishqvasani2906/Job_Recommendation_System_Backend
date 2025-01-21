@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/userlogin/login", "/userlogin/register" , "/userlogin/logout").permitAll()
                         .requestMatchers("/userlogin/change-password","/userlogin/forgot-password","/userlogin/reset-password/**").permitAll()
                         .requestMatchers("/api/jobs","/api/jobs/update-jobs","/api/jobs/insert").permitAll()
+                                .requestMatchers("/userlogin/auth/google/callback").permitAll()
 //                        .requestMatchers("/api/jobs/post/new").hasAnyRole("COMPANY", "ADMIN")
                         .anyRequest().authenticated()
                 )
