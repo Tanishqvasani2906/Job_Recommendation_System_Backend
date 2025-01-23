@@ -37,4 +37,9 @@ public class JobsController {
         return ResponseEntity.ok("Job update triggered");
     }
 
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("Server is alive!");
+    }
+
 }
