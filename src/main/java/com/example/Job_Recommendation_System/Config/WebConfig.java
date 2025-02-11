@@ -14,7 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://127.0.0.1:5173, https://careervistaa.vercel.app ") // Your front-end origin
+                        .allowedOrigins("http://127.0.0.1:5173", "https://careervistaa.vercel.app") // Your front-end origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow these methods
                         .allowedHeaders("*")
                         .allowCredentials(true) // Allow credentials if needed
