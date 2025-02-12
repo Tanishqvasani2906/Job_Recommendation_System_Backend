@@ -56,10 +56,10 @@ public class AuthController {
     public ResponseEntity<String> registerUser(@RequestBody Users user) {
         // Check if username or email already exists
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return new ResponseEntity<>("Username is already taken.", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already registered");
         }
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return new ResponseEntity<>("Email is already registered.", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already registered");
         }
 
         // Encode the password before saving

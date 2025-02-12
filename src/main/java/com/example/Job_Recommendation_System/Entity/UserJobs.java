@@ -14,9 +14,9 @@ public class UserJobs {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String userJobId;
-    @Column(name = "title",nullable = false)
+    @Column(name = "title",nullable = false,columnDefinition = "TEXT")
     private String title;
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "TEXT")
     private String companyName;
     @Column(columnDefinition = "TEXT", nullable = false) // For long descriptions
     private String description;
@@ -28,6 +28,26 @@ public class UserJobs {
     private String companyUrl;
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+    @Column(name = "city", nullable = false, columnDefinition = "TEXT")
+    private String city;
+    @Column(name = "state", nullable = false, columnDefinition = "TEXT")
+    private String state;
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
     public String getCompanyName() {
         return companyName;

@@ -7,6 +7,8 @@ import com.example.Job_Recommendation_System.Repository.UserJobsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class JobsService {
     @Autowired
@@ -18,8 +20,8 @@ public class JobsService {
         return userJobsRepo.save(userJobs);
     }
 
-//    public Jobs postNewJob(Jobs jobs) {
-//        return jobRepo.save(jobs);
-//    }
+    public List<UserJobs> searchJobs(String title, String tags, String companyName, String city, String state) {
+        return userJobsRepo.findByTitleContainingIgnoreCaseOrTagsContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrCityContainingIgnoreCaseOrStateContainingIgnoreCase(title, tags, companyName, city,state);
+    }
 
 }

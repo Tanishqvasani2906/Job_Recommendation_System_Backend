@@ -9,12 +9,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/userjobs")
@@ -41,6 +39,14 @@ public class UserJobsController {
             // Handle unauthorized access case if needed
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
+    }
+
+    @GetMapping("/search-jobs")
+    public ResponseEntity<List<UserJobs>> searchRelatedJobs(@RequestParam(required = false) String tags , @RequestParam(required = false) String title
+    , @RequestParam(required = false) String companyName, @RequestParam(required = false) String city,
+      @RequestParam(required = false) String state) {
+        List<UserJobs> jobsList =  jobsService.searchJobs(title, tags, companyName, city,state);
+        return ResponseEntity.ok(jobsList);
     }
 
 }
