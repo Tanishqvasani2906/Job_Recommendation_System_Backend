@@ -10,20 +10,11 @@ import java.util.List;
 
 @Repository
 public interface UserJobsRepo extends JpaRepository<UserJobs, String> {
-//    @Query("SELECT j FROM UserJobs j WHERE " +
-//            "(:title IS NULL OR j.title ILIKE CONCAT('%', :title, '%')) " +
-//            "AND (:tags IS NULL OR j.tags ILIKE CONCAT('%', :tags, '%')) " +
-//            "AND (:companyName IS NULL OR j.companyName ILIKE CONCAT('%', :companyName, '%')) " +
-//            "AND (:city IS NULL OR j.city ILIKE CONCAT('%', :city, '%')) " +
-//            "AND (:state IS NULL OR j.state ILIKE CONCAT('%', :state, '%'))")
-//    List<UserJobs> searchJobs(
-//            @Param("title") String title,
-//            @Param("tags") String tags,
-//            @Param("companyName") String companyName,
-//            @Param("city") String city,
-//            @Param("state") String state);
-    List<UserJobs> findByTitleContainingIgnoreCaseOrTagsContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrCityContainingIgnoreCaseOrStateContainingIgnoreCase(
-        String title, String tags, String companyName, String city, String state);
+//    List<UserJobs> findByTitleContainingIgnoreCaseOrTagsContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrCityContainingIgnoreCaseOrStateContainingIgnoreCase(
+//        String title, String tags, String companyName, String city, String state);
 
-
+    List<UserJobs> findByTitleContainingIgnoreCaseOrTagsContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseAndCityContainingIgnoreCaseOrStateContainingIgnoreCase(
+            String value1, String value1Again, String value1Third, String value2, String value2Again);
+    List<UserJobs> findByCityContainingIgnoreCaseOrStateContainingIgnoreCase(
+            String value2, String value2Again);
 }

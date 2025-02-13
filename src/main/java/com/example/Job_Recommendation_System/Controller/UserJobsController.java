@@ -41,12 +41,22 @@ public class UserJobsController {
         }
     }
 
+//    @GetMapping("/search-jobs")
+//    public ResponseEntity<List<UserJobs>> searchRelatedJobs(@RequestParam(required = false) String tags , @RequestParam(required = false) String title
+//    , @RequestParam(required = false) String companyName, @RequestParam(required = false) String city,
+//      @RequestParam(required = false) String state) {
+//        List<UserJobs> jobsList =  jobsService.searchJobs(title, tags, companyName, city,state);
+//        return ResponseEntity.ok(jobsList);
+//    }
+
     @GetMapping("/search-jobs")
-    public ResponseEntity<List<UserJobs>> searchRelatedJobs(@RequestParam(required = false) String tags , @RequestParam(required = false) String title
-    , @RequestParam(required = false) String companyName, @RequestParam(required = false) String city,
-      @RequestParam(required = false) String state) {
-        List<UserJobs> jobsList =  jobsService.searchJobs(title, tags, companyName, city,state);
+    public ResponseEntity<List<UserJobs>> searchRelatedJobs(
+            @RequestParam(required = false) String value1,
+            @RequestParam(required = false) String value2) {
+
+        List<UserJobs> jobsList = jobsService.searchJobs(value1, value2);
         return ResponseEntity.ok(jobsList);
     }
+
 
 }
