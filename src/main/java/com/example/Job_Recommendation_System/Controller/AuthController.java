@@ -31,10 +31,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.security.SignatureException;
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/userlogin")
@@ -52,24 +49,48 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody Users user) {
-        // Check if username or email already exists
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already registered");
-        }
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already registered");
-        }
+//    @PostMapping("/register")
+//    public ResponseEntity<String> registerUser(@RequestBody Users user) {
+//        // Check if username or email already exists
+//        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already registered");
+//        }
+//        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already registered");
+//        }
+//
+//        // Encode the password before saving
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//
+//        // Save the user
+//        userRepository.save(user);
+//
+//        return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
+//    }
+@PostMapping("/register")
+public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user) {
+    Map<String, String> response = new HashMap<>();
 
-        // Encode the password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // Save the user
-        userRepository.save(user);
-
-        return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
+    // Check if username or email already exists
+    if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        response.put("error", "Username is already registered");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
+    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        response.put("error", "Email is already registered");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    // Encode the password before saving
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+    // Save the user
+    userRepository.save(user);
+
+    response.put("message", "User registered successfully!");
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+}
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         // Find user by username or email
