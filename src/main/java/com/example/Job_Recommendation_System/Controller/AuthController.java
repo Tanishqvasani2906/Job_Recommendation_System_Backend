@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -91,40 +92,52 @@ public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user)
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
 }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        // Find user by username or email
-        Users user = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail(), loginRequest.getUsernameOrEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+@PostMapping("/login")
+public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+    // Find user by username or email
+    Optional<Users> userOptional = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail(), loginRequest.getUsernameOrEmail());
 
+    if (userOptional.isEmpty()) {
+        // Return error if user is not found
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Username or email is not registered"));
+    }
+
+    Users user = userOptional.get();
+
+    try {
         // Authenticate the user
-        Authentication authentication = authenticationManager.authenticate(
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(), loginRequest.getPassword())
         );
-
-        // Generate JWT token using JWTService
-        String jwtToken = jwtService.generateToken(user);
-
-        // Return the token and user ID in the response
-        return ResponseEntity.ok(new LoginResponse(jwtToken, user.getUser_id()));
+    } catch (BadCredentialsException e) {
+        // Return error if password is incorrect
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Your password is incorrect"));
     }
+
+    // Generate JWT token using JWTService
+    String jwtToken = jwtService.generateToken(user);
+
+    // Return the token and user ID in the response
+    return ResponseEntity.ok(new LoginResponse(jwtToken, user.getUser_id()));
+}
+
 
 
     private final Set<String> blacklistedTokens = new HashSet<>();
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().body("Invalid or missing token.");
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error","Invalid or missing token."));
         }
 
         String token = authorizationHeader.substring(7); // Extract the token
         blacklistedTokens.add(token); // Add to the blacklist
 
-        return ResponseEntity.ok("Logged out successfully.");
+        return ResponseEntity.ok(Collections.singletonMap("error","Logged out successfully."));
     }
 
     @PostMapping("/change-password")
-    public String changePassword(@RequestBody ChangePasswordRequest request, @RequestHeader("Authorization") String authHeader) {
+    public Map<String,String> changePassword(@RequestBody ChangePasswordRequest request, @RequestHeader("Authorization") String authHeader) {
         try {
             // Extract token from Authorization header
             String token = authHeader.substring(7);
@@ -135,29 +148,29 @@ public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user)
             // Find the user by email
             Optional<Users> userOptional = userRepository.findByEmail(userEmail);
             if (userOptional.isEmpty()) {
-                return "User not found.";
+                return Collections.singletonMap("error","User with this email not found");
             }
 
             Users user = userOptional.get();
 
             // Validate old password
             if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-                return "Old password is incorrect.";
+                return Collections.singletonMap("error","Old password is incorrect.");
             }
 
             // Check new password and confirm password match
             if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-                return "New password and confirm password do not match.";
+                return Collections.singletonMap("error","New password and confirm password do not match.");
             }
 
             // Update the password
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
             userRepository.save(user);
 
-            return "Password changed successfully.";
+            return Collections.singletonMap("error","Password changed successfully.");
         } catch (Exception e) {
             // Handle any token parsing or other exceptions
-            return "Invalid token or unauthorized request.";
+            return Collections.singletonMap("error","Invalid token or unauthorized request.");
         }
     }
 
@@ -166,7 +179,7 @@ public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user)
         String email = request.get("email");
         try {
             userService.generateTempToken(email);
-            return ResponseEntity.ok("Password reset link sent to your email.");
+            return ResponseEntity.ok(Collections.singletonMap("error","Password reset link sent to your email."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
@@ -184,9 +197,9 @@ public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user)
         try {
             boolean resetSuccessful = userService.resetPassword(user_id, temp_token, newPassword);
             if (resetSuccessful) {
-                return ResponseEntity.ok("Password has been reset successfully.");
+                return ResponseEntity.ok(Collections.singletonMap("error","Password has been reset successfully."));
             } else {
-                return ResponseEntity.badRequest().body("Error: Invalid user ID or token.");
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error","Error: Invalid user ID or token."));
             }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -385,7 +398,4 @@ public ResponseEntity<String> handleGoogleCallback(@RequestParam("code") String 
             throw new RuntimeException("Error processing user info");
         }
     }
-
-
-
 }
