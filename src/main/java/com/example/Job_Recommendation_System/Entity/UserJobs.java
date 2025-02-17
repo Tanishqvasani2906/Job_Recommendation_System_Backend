@@ -33,6 +33,18 @@ public class UserJobs {
     @Column(name = "state", nullable = false, columnDefinition = "TEXT")
     private String state;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users users;
+
+    public Users getUser() {
+        return users;
+    }
+
+    public void setUser(Users users) {
+        this.users = users;
+    }
+
     public String getCity() {
         return city;
     }
@@ -112,4 +124,5 @@ public class UserJobs {
     public void setUserJobId(String userJobId) {
         this.userJobId = userJobId;
     }
+
 }

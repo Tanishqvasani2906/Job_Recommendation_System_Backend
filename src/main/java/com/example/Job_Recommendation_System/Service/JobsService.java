@@ -12,8 +12,6 @@ import java.util.List;
 @Service
 public class JobsService {
     @Autowired
-    private JobRepo jobRepo;
-    @Autowired
     private UserJobsRepo userJobsRepo;
 
     public UserJobs saveNewJobs(UserJobs userJobs) {
@@ -33,4 +31,7 @@ public List<UserJobs> searchJobs(String value1, String value2) {
             value1, value1, value1, value2, value2);
 }
 
+    public List<UserJobs> getJobsByUserId(String user_id) {
+        return userJobsRepo.findByUserId(user_id);
+    }
 }

@@ -246,6 +246,7 @@ public ResponseEntity<String> handleGoogleCallback(@RequestParam("code") String 
         // Step 4: Parse and process user info (authenticate or register)
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode userInfoJson = objectMapper.readTree(userInfo);
+        System.out.println(userInfoJson);
 
         String googleId = userInfoJson.get("sub").asText(); // Google unique user ID
         String email = userInfoJson.get("email").asText();

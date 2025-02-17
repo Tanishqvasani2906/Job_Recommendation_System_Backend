@@ -1,11 +1,14 @@
 package com.example.Job_Recommendation_System.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -149,4 +152,15 @@ public class Users {
     @Column(name = "roles", nullable = false)
     private Role role = Role.EMPLOYEE;
 
+    @OneToMany(mappedBy = "users",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    private List<UserJobs> jobs= new ArrayList<>();;
+
+    public List<UserJobs> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<UserJobs> jobs) {
+        this.jobs = jobs;
+    }
 }

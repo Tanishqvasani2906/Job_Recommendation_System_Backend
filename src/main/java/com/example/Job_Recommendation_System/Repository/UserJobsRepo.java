@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface UserJobsRepo extends JpaRepository<UserJobs, String> {
+    @Query("SELECT uj FROM UserJobs uj WHERE uj.users.user_id = :user_id")
+    List<UserJobs> findByUserId(@Param("user_id") String user_id);
 //    List<UserJobs> findByTitleContainingIgnoreCaseOrTagsContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrCityContainingIgnoreCaseOrStateContainingIgnoreCase(
 //        String title, String tags, String companyName, String city, String state);
 
