@@ -25,6 +25,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/userjobs")
+@CrossOrigin("http://127.0.0.1:5173")
 public class UserJobsController {
     @Autowired
     private JobsService jobsService;
