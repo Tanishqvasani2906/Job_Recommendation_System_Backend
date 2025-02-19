@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,5 +89,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Ensure the role is correctly extracted with the "ROLE_" prefix
         return (String) claims.get("roles"); // Assuming the role key is "roles"
     }
+
+    public String extractUsername(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY.getBytes(StandardCharsets.UTF_8))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        String email = claims.get("email", String.class);
+        System.out.println("Extracted Email from Token: " + email);
+
+        if (email == null) {
+            throw new IllegalArgumentException("Email extracted from JWT is null!");
+        }
+
+        return email;
+    }
+
+
 
 }

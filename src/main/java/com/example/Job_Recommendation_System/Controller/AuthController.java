@@ -7,6 +7,7 @@ import com.example.Job_Recommendation_System.Dto.LoginResponse;
 import com.example.Job_Recommendation_System.Entity.Users;
 import com.example.Job_Recommendation_System.Repository.UserRepo;
 import com.example.Job_Recommendation_System.Service.JWTService;
+import com.example.Job_Recommendation_System.Service.TokenBlacklistService;
 import com.example.Job_Recommendation_System.Service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.token.TokenService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -49,6 +51,8 @@ public class AuthController {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     @Autowired
     private UserService userService;
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
 //    @PostMapping("/register")
 //    public ResponseEntity<String> registerUser(@RequestBody Users user) {
@@ -123,18 +127,46 @@ public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
 
 
 
-    private final Set<String> blacklistedTokens = new HashSet<>();
+//    private final Set<String> blacklistedTokens = new HashSet<>();
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader,
+                                        HttpServletRequest request, HttpServletResponse response) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error","Invalid or missing token."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Invalid token"));
         }
 
-        String token = authorizationHeader.substring(7); // Extract the token
-        blacklistedTokens.add(token); // Add to the blacklist
+        String token = authorizationHeader.substring(7);
+        String email = jwtAuthenticationFilter.extractUsername(token);
 
-        return ResponseEntity.ok(Collections.singletonMap("error","Logged out successfully."));
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Invalid token payload"));
+        }
+
+        tokenBlacklistService.blacklistToken(token);
+
+        // Invalidate session
+        SecurityContextHolder.clearContext();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        response.setHeader("Clear-Site-Data", "\"cookies\", \"storage\", \"executionContexts\"");
+        return ResponseEntity.ok(Collections.singletonMap("message", "Logged out successfully."));
     }
+
+
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader) {
+//        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+//            return ResponseEntity.badRequest().body(Collections.singletonMap("error","Invalid or missing token."));
+//        }
+//
+//        String token = authorizationHeader.substring(7); // Extract the token
+//        blacklistedTokens.add(token); // Add to the blacklist
+//
+//        return ResponseEntity.ok(Collections.singletonMap("error","Logged out successfully."));
+//    }
 
     @PostMapping("/change-password")
     public Map<String,String> changePassword(@RequestBody ChangePasswordRequest request, @RequestHeader("Authorization") String authHeader) {
