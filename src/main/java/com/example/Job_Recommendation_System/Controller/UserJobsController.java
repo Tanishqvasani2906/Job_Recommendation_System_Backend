@@ -91,6 +91,8 @@ public class UserJobsController {
             newJob.setCity(jobRequest.getCity());
             newJob.setState(jobRequest.getState());
             newJob.setUpdatedAt(LocalDateTime.now());
+            newJob.setJobType(jobRequest.getJobType());
+            newJob.setSalary(jobRequest.getSalary());
             newJob.setUser(currentUser); // Set the user
 
             UserJobs savedJob = jobsService.saveNewJobs(newJob);

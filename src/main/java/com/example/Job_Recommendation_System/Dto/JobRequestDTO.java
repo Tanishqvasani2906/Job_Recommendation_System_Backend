@@ -16,6 +16,8 @@ public class JobRequestDTO {
     private String companyUrl;
     private String city;
     private String state;
+    private String jobType;
+    private String salary;
 
     public String getCity() {
         return city;
@@ -47,6 +49,14 @@ public class JobRequestDTO {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public String getSalary() {
+        return salary;
     }
 }
 
