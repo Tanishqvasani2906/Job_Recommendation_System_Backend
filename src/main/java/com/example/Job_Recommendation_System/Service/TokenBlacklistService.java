@@ -15,6 +15,7 @@ public class TokenBlacklistService {
     }
 
     public boolean isTokenBlacklisted(String token) {
+        if(token==null) return false;
         return blacklistedTokens.contains(token);
     }
 }
