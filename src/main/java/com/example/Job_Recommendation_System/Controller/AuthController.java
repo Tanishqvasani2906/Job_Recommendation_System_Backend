@@ -54,24 +54,6 @@ public class AuthController {
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
 
-//    @PostMapping("/register")
-//    public ResponseEntity<String> registerUser(@RequestBody Users user) {
-//        // Check if username or email already exists
-//        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already registered");
-//        }
-//        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already registered");
-//        }
-//
-//        // Encode the password before saving
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//
-//        // Save the user
-//        userRepository.save(user);
-//
-//        return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
-//    }
 @PostMapping("/register")
 public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user) {
     Map<String, String> response = new HashMap<>();
@@ -125,9 +107,6 @@ public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
     return ResponseEntity.ok(new LoginResponse(jwtToken, user.getUser_id()));
 }
 
-
-
-//    private final Set<String> blacklistedTokens = new HashSet<>();
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader,
                                         HttpServletRequest request, HttpServletResponse response) {
@@ -154,19 +133,6 @@ public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         response.setHeader("Clear-Site-Data", "\"cookies\", \"storage\", \"executionContexts\"");
         return ResponseEntity.ok(Collections.singletonMap("message", "Logged out successfully."));
     }
-
-
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader) {
-//        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-//            return ResponseEntity.badRequest().body(Collections.singletonMap("error","Invalid or missing token."));
-//        }
-//
-//        String token = authorizationHeader.substring(7); // Extract the token
-//        blacklistedTokens.add(token); // Add to the blacklist
-//
-//        return ResponseEntity.ok(Collections.singletonMap("error","Logged out successfully."));
-//    }
 
     @PostMapping("/change-password")
     public Map<String,String> changePassword(@RequestBody ChangePasswordRequest request, @RequestHeader("Authorization") String authHeader) {

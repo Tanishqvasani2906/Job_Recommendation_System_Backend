@@ -4,6 +4,7 @@ import com.example.Job_Recommendation_System.Entity.Role;
 import com.example.Job_Recommendation_System.Service.CustomUserDetailsService;
 
 import com.example.Job_Recommendation_System.Service.JWTService;
+import com.example.Job_Recommendation_System.Service.TokenBlacklistService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
@@ -31,11 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final CustomUserDetailsService userDetailsService;
     private final JWTService jwtService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final String SECRET_KEY = "fd893e3258f7bbabbb32d2faf7a522ad68658e44d0ea1e1f0a586f4f0766598931ffd28306878037b787321e599088090eddd36f4a2d0921bcadbb87945e44e55181e6595ac59976d9a5370e9db23299cb7dfb386cfc593d9eb327f24b9505ce90e96157da52eff9a878073f34a54b825f0b3414e1530f047bcebeb93889a300b5c585471ee0d05a8efe8f1a8e153e45e82d6b8091e7a75cb00f409fafec22b0777060113436fcf7a8c3c0ec66b875a7f2960730990f3f3e8d798f1c298ccfd75037ce1fa3cd3fecd2c742151fe9e2ee168b709d1600169954933a147b6ad6dc10b4f9776bb0064279155684d2a3b0074dc3651e5bc7493630ca4ea9080a46b7"; // Replace with a secure key
 
-    public JwtAuthenticationFilter(CustomUserDetailsService userDetailsService,JWTService jwtService) {
+    public JwtAuthenticationFilter(CustomUserDetailsService userDetailsService, JWTService jwtService, TokenBlacklistService tokenBlacklistService) {
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -43,7 +46,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String jwtToken = extractTokenFromRequest(request);
-
+        boolean isBlacklisted = tokenBlacklistService.isTokenBlacklisted(jwtToken);
+        if (isBlacklisted) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token is blacklisted. Please log in again.");
+            return;
+        }
         if (jwtToken != null && jwtService.validateToken(jwtToken)) {
             String userEmail = jwtService.extractEmail(jwtToken);
             String userId = jwtService.extractUserId(jwtToken);
