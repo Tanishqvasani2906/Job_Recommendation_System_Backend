@@ -52,7 +52,7 @@ public class UserService {
         userRepo.save(user);
 
         // Construct the email link
-        String resetLink = "http://127.0.0.1:5173/reset-password/" + user.getUser_id() + "/" + tempToken;
+        String resetLink = "https://careervistaa.vercel.app/reset-password/" + user.getUser_id() + "/" + tempToken;
 
         // Send the email
         sendEmail(user.getEmail(), "Password Reset Request", resetLink);
