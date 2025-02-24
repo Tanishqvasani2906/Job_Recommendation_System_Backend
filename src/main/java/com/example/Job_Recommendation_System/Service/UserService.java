@@ -128,6 +128,7 @@ private void sendEmail(String to, String subject, String resetLink) throws Messa
     }
 
 
-
-
+    public Users getallinfoofuser(String userId) {
+        return userRepo.findByUserId(userId).orElse(null);
+    }
 }
