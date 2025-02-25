@@ -13,7 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -82,11 +84,16 @@ private void sendEmail(String to, String subject, String resetLink) throws Messa
     helper.setTo(to);
     helper.setSubject(subject);
 
-    // Firebase Storage logo URL (Public Link)
+    // Firebase Storage logo URL
     String imageUrl = "https://firebasestorage.googleapis.com/v0/b/disaster-management-2906.appspot.com/o/images%2F942762.png?alt=media";
 
-    // Load the email template
-    String htmlTemplate = new String(Files.readAllBytes(Paths.get("src/main/resources/templates/reset-password.html")), StandardCharsets.UTF_8);
+    // ✅ Load the template using ClassLoader
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream("templates/reset-password.html");
+    if (inputStream == null) {
+        throw new FileNotFoundException("Template file not found in resources/templates/");
+    }
+
+    String htmlTemplate = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
     // Replace placeholders with actual values
     String emailContent = htmlTemplate
@@ -98,6 +105,7 @@ private void sendEmail(String to, String subject, String resetLink) throws Messa
 
     mailSender.send(message);
 }
+
 
 
     public boolean resetPassword(String userId, String tempToken, String newPassword) {
