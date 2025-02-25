@@ -129,6 +129,36 @@ public class Users {
     @Column(name = "temp_token")
     private String tempToken;
 
+    @Column(name = "temp_token_expiry")
+    private LocalDateTime tempTokenExpiry;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "roles", nullable = false)
+    private Role role = Role.EMPLOYEE;
+
+    @OneToMany(mappedBy = "users",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    private List<UserJobs> jobs= new ArrayList<>();;
+
+    @OneToOne(mappedBy = "users", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private CareerPreferences careerPreferences;
+
+    public CareerPreferences getCareerPreferences() {
+        return careerPreferences;
+    }
+
+    public void setCareerPreferences(CareerPreferences careerPreferences) {
+        this.careerPreferences = careerPreferences;
+    }
+
+    public List<UserJobs> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<UserJobs> jobs) {
+        this.jobs = jobs;
+    }
     public LocalDateTime getTempTokenExpiry() {
         return tempTokenExpiry;
     }
@@ -143,24 +173,5 @@ public class Users {
 
     public void setTempToken(String tempToken) {
         this.tempToken = tempToken;
-    }
-
-    @Column(name = "temp_token_expiry")
-    private LocalDateTime tempTokenExpiry;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "roles", nullable = false)
-    private Role role = Role.EMPLOYEE;
-
-    @OneToMany(mappedBy = "users",cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonIgnore
-    private List<UserJobs> jobs= new ArrayList<>();;
-
-    public List<UserJobs> getJobs() {
-        return jobs;
-    }
-
-    public void setJobs(List<UserJobs> jobs) {
-        this.jobs = jobs;
     }
 }
