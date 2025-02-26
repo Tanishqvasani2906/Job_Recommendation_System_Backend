@@ -71,15 +71,20 @@ public class CareerPreferencesController {
             return ResponseEntity.badRequest().body("User not found.");
         }
 
-        Optional<CareerPreferences> careerPreferencesOpt = careerPreferencesRepo.findByUsersWithEducation(userOpt.get());
+        Optional<CareerPreferences> careerPreferencesOpt = careerPreferencesRepo.findByUsersWithEducationAndInternships(userOpt.get());
         if (careerPreferencesOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         CareerPreferences careerPreferences = careerPreferencesOpt.get();
-        System.out.println("Education: " + careerPreferences.getEducation()); // Debugging
+
+        // 🔍 Debugging
+        System.out.println("Internships: " + careerPreferences.getInternships());
+        System.out.println("Education: " + careerPreferences.getEducation());
+
         return ResponseEntity.ok(careerPreferences);
     }
+
 
 
     // ✅ 3️⃣ Update Career Preferences

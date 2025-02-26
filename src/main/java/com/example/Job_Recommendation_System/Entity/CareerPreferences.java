@@ -34,7 +34,7 @@ public class CareerPreferences {
     @JoinColumn(name = "user_id",unique = true, nullable = false)
     private Users users;
 
-    @OneToMany(mappedBy = "careerPreferences", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "careerPreferences", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER )
     private List<Internships> internships;
     @OneToMany(mappedBy = "careerPreferences",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Projects> projects;

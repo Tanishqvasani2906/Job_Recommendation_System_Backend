@@ -13,4 +13,12 @@ public interface CareerPreferencesRepo extends JpaRepository<CareerPreferences, 
     @Query("SELECT cp FROM CareerPreferences cp LEFT JOIN FETCH cp.education WHERE cp.users = :user")
     Optional<CareerPreferences> findByUsersWithEducation(@Param("user") Users user);
 
+    @Query("""
+    SELECT cp FROM CareerPreferences cp 
+    LEFT JOIN FETCH cp.internships 
+    LEFT JOIN FETCH cp.education 
+    WHERE cp.users = :user
+""")
+    Optional<CareerPreferences> findByUsersWithEducationAndInternships(@Param("user") Users user);
+
 }

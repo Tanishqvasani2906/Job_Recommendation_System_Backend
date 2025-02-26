@@ -1,5 +1,6 @@
 package com.example.Job_Recommendation_System.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -38,7 +39,7 @@ public class Internships {
 
     @ManyToOne
     @JoinColumn(name = "careerPreferences_id")
-    @JsonIgnore
+    @JsonBackReference
     private CareerPreferences careerPreferences;
 
     public CareerPreferences getCareerPreferences() {

@@ -1,5 +1,6 @@
 package com.example.Job_Recommendation_System.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Projects {
 
     @ManyToOne
     @JoinColumn(name = "careerPreferences_id")
+    @JsonIgnore
     private CareerPreferences careerPreferences;
 
     public CareerPreferences getCareerPreferences() {
