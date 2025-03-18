@@ -5,8 +5,8 @@ import com.example.Job_Recommendation_System.Dto.ChangePasswordRequest;
 import com.example.Job_Recommendation_System.Dto.LoginRequest;
 import com.example.Job_Recommendation_System.Dto.LoginResponse;
 import com.example.Job_Recommendation_System.Dto.UserUpdateDTO;
-import com.example.Job_Recommendation_System.Entity.Users;
-import com.example.Job_Recommendation_System.Repository.UserRepo;
+import com.example.Job_Recommendation_System.Entity.*;
+import com.example.Job_Recommendation_System.Repository.*;
 import com.example.Job_Recommendation_System.Service.JWTService;
 import com.example.Job_Recommendation_System.Service.TokenBlacklistService;
 import com.example.Job_Recommendation_System.Service.UserService;
@@ -54,32 +54,83 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
+    @Autowired
+    private EducationRepo educationRepo;
+    @Autowired
+    private Class10Repo class10Repo;
+    @Autowired
+    private Class12Repo class12Repo;
+    @Autowired
+    private DegreeRepo degreeRepo;
+    @Autowired
+    private CareerPreferencesRepo careerPreferencesRepo;
 
-@PostMapping("/register")
-public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user) {
-    Map<String, String> response = new HashMap<>();
+//@PostMapping("/register")
+//public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user) {
+//    Map<String, String> response = new HashMap<>();
+//
+//    // Check if username or email already exists
+//    if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+//        response.put("error", "Username is already registered");
+//        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+//    }
+//    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+//        response.put("error", "Email is already registered");
+//        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+//    }
+//
+//    // Encode the password before saving
+//    user.setPassword(passwordEncoder.encode(user.getPassword()));
+//
+//    // Save the user
+//    userRepository.save(user);
+//
+//    response.put("message", "User registered successfully!");
+//    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//}
 
-    // Check if username or email already exists
-    if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-        response.put("error", "Username is already registered");
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user) {
+        Map<String, String> response = new HashMap<>();
+
+        // Check if username or email already exists
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            response.put("error", "Username is already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            response.put("error", "Email is already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+        // Encode the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Save the user first
+        Users savedUser = userRepository.save(user);
+
+        // Auto-create CareerPreferences linked to user
+        CareerPreferences careerPreferences = new CareerPreferences();
+        careerPreferences.setUsers(savedUser);
+        careerPreferences = careerPreferencesRepo.save(careerPreferences);
+
+        // Auto-create Education and link to CareerPreferences
+        Education education = new Education();
+        education = educationRepo.save(education);
+
+        careerPreferences.setEducation(education);
+        careerPreferencesRepo.save(careerPreferences);
+
+        // Create empty Class10, Class12, and Degree records linked to Education
+        class10Repo.save(new Class10(education));
+        class12Repo.save(new Class12(education));
+        degreeRepo.save(new Degree(education));
+
+        response.put("message", "User registered successfully!");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-        response.put("error", "Email is already registered");
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
 
-    // Encode the password before saving
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-    // Save the user
-    userRepository.save(user);
-
-    response.put("message", "User registered successfully!");
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-}
-
-@PostMapping("/login")
+    @PostMapping("/login")
 public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
     // Find user by username or email
     Optional<Users> userOptional = userRepository.findByUsernameOrEmail(loginRequest.getUsernameOrEmail(), loginRequest.getUsernameOrEmail());

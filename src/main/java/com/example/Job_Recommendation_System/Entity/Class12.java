@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "class12")
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 public class Class12 {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,6 +27,10 @@ public class Class12 {
     @JoinColumn(name = "education_id", unique = true)
     @JsonIgnore
     private Education education;
+
+    public Class12(Education education) {
+        this.education = education;
+    }
 
     public String getBoard() {
         return board;

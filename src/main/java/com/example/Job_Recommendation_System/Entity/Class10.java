@@ -24,6 +24,10 @@ public class Class10 {
     @JsonIgnore
     private Education education;
 
+    public Class10(Education education) {
+        this.education = education;
+    }
+
     public String getBoard() {
         return board;
     }

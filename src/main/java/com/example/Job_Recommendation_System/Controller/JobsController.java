@@ -5,6 +5,8 @@ import com.example.Job_Recommendation_System.Repository.JobRepo;
 import com.example.Job_Recommendation_System.Service.JobUpdateService;
 import com.example.Job_Recommendation_System.Service.JobsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,7 @@ public class JobsController {
     @Autowired
     private JobUpdateService jobUpdateService;
 
+    @Cacheable(value = "jobsCache")
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<Jobs>> getAllJobs() {
         List<Jobs> list = jobRepo.findAll();
@@ -31,6 +34,7 @@ public class JobsController {
         jobUpdateService.insertJobs(jobs);  // Calling the service method to insert jobs
     }
 
+    @CacheEvict(value = "jobsCache", allEntries = true) // Clears cache
     @GetMapping("/update-jobs")
     public ResponseEntity<String> updateJobsManually() {
         jobUpdateService.updateJobs();

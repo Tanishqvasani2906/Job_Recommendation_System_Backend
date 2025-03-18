@@ -26,6 +26,10 @@ public class Degree {
     @JsonIgnore
     private Education education;
 
+    public Degree(Education education) {
+        this.education=education;
+    }
+
     public Education getEducation() {
         return education;
     }
