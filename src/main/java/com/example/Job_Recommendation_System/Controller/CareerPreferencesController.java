@@ -105,11 +105,18 @@ public class CareerPreferencesController {
         CareerPreferences existingPreferences = careerPreferencesOpt.get();
 
         // Update only non-null fields
-        if (updatedPreferences.getPreferedJobType() != null) existingPreferences.setPreferedJobType(updatedPreferences.getPreferedJobType());
-        if (updatedPreferences.getPreferedLocation() != null) existingPreferences.setPreferedLocation(updatedPreferences.getPreferedLocation());
-        if (updatedPreferences.getProfileSummary() != null) existingPreferences.setProfileSummary(updatedPreferences.getProfileSummary());
-        if (updatedPreferences.getKeySkills() != null) existingPreferences.setKeySkills(updatedPreferences.getKeySkills());
-        if (updatedPreferences.getLanguage() != null) existingPreferences.setLanguage(updatedPreferences.getLanguage());
+//        if (updatedPreferences.getPreferedJobType() != null) existingPreferences.setPreferedJobType(updatedPreferences.getPreferedJobType());
+//        if (updatedPreferences.getPreferedLocation() != null) existingPreferences.setPreferedLocation(updatedPreferences.getPreferedLocation());
+//        if (updatedPreferences.getProfileSummary() != null) existingPreferences.setProfileSummary(updatedPreferences.getProfileSummary());
+//        if (updatedPreferences.getKeySkills() != null) existingPreferences.setKeySkills(updatedPreferences.getKeySkills());
+//        if (updatedPreferences.getLanguage() != null) existingPreferences.setLanguage(updatedPreferences.getLanguage());
+//        if(updatedPreferences.getResumeUrl()!=null) existingPreferences.setResumeUrl(updatedPreferences.getResumeUrl());
+        Optional.ofNullable(updatedPreferences.getPreferedJobType()).ifPresent(existingPreferences::setPreferedJobType);
+        Optional.ofNullable(updatedPreferences.getPreferedLocation()).ifPresent(existingPreferences::setPreferedLocation);
+        Optional.ofNullable(updatedPreferences.getProfileSummary()).ifPresent(existingPreferences::setProfileSummary);
+        Optional.ofNullable(updatedPreferences.getKeySkills()).ifPresent(existingPreferences::setKeySkills);
+        Optional.ofNullable(updatedPreferences.getLanguage()).ifPresent(existingPreferences::setLanguage);
+        Optional.ofNullable(updatedPreferences.getResumeUrl()).ifPresent(existingPreferences::setResumeUrl);
 
         CareerPreferences savedPreferences = careerPreferencesRepo.save(existingPreferences);
         return ResponseEntity.ok(savedPreferences);

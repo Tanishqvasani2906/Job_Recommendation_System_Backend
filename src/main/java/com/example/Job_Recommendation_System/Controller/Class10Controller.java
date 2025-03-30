@@ -4,6 +4,7 @@ import com.example.Job_Recommendation_System.Entity.Class10;
 import com.example.Job_Recommendation_System.Entity.Education;
 import com.example.Job_Recommendation_System.Repository.Class10Repo;
 import com.example.Job_Recommendation_System.Repository.EducationRepo;
+import com.example.Job_Recommendation_System.Service.Class10Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,8 @@ public class Class10Controller {
     private EducationRepo educationRepo;
     @Autowired
     private Class10Repo class10Repo;
+    @Autowired
+    private Class10Service class10Service;
 
     // ✅ Add Class10 record (Requires education_id)
     @PostMapping("/add/{education_id}")
@@ -42,5 +45,15 @@ public class Class10Controller {
         }
 
         return ResponseEntity.ok(class10Opt.get());
+    }
+
+    @PutMapping("/update/{class10Id}")
+    public ResponseEntity<?> updateClass10(@PathVariable String class10Id, @RequestBody Class10 updatedClass10) {
+        try {
+            Optional<Class10> savedClass10 = class10Service.updateClass10(class10Id, updatedClass10);
+            return ResponseEntity.ok(savedClass10);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

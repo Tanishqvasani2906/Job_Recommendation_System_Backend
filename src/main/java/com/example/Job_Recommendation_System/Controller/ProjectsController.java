@@ -21,7 +21,7 @@ public class ProjectsController {
     @Autowired
     private CareerPreferencesRepo careerPreferencesRepo;
 
-    // ✅ 1️⃣ Add a Project to Career Preferences
+    // ✅ 1️⃣ Add a Project
     @PostMapping("/add/{careerPreferencesId}")
     public ResponseEntity<?> addProjects(@PathVariable String careerPreferencesId, @RequestBody Projects projects) {
         Optional<CareerPreferences> careerPreferencesOpt = careerPreferencesRepo.findById(careerPreferencesId);
@@ -31,9 +31,15 @@ public class ProjectsController {
         }
 
         CareerPreferences careerPreferences = careerPreferencesOpt.get();
-        projects.setCareerPreferences(careerPreferences);  // Associate project with career preferences
-        Projects savedProject = projectsRepo.save(projects);
+        projects.setCareerPreferences(careerPreferences);
 
+        // Validate dates
+        if (projects.getProjectDurationFrom() != null && projects.getProjectDurationTo() != null &&
+                projects.getProjectDurationFrom().isAfter(projects.getProjectDurationTo())) {
+            return ResponseEntity.badRequest().body("Project start date cannot be after end date.");
+        }
+
+        Projects savedProject = projectsRepo.save(projects);
         return ResponseEntity.ok(savedProject);
     }
 
@@ -41,23 +47,18 @@ public class ProjectsController {
     @GetMapping("/{careerPreferencesId}")
     public ResponseEntity<?> getProjects(@PathVariable String careerPreferencesId) {
         List<Projects> projectsList = projectsRepo.findByCareerPreferencesId(careerPreferencesId);
-
-        if (projectsList.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(projectsList);
+        return projectsList.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(projectsList);
     }
 
     // ✅ 3️⃣ Get a Single Project by ID
     @GetMapping("/project/{projectId}")
     public ResponseEntity<?> getProjectById(@PathVariable String projectId) {
-        Optional<Projects> projectOpt = projectsRepo.findById(projectId);
-
-        return projectOpt.map(ResponseEntity::ok)
+        return projectsRepo.findById(projectId)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ✅ 4️⃣ Update an Existing Project
+    // ✅ 4️⃣ Update Project (Handles Null Fields)
     @PutMapping("/update/{projectId}")
     public ResponseEntity<?> updateProject(@PathVariable String projectId, @RequestBody Projects updatedProject) {
         Optional<Projects> projectOpt = projectsRepo.findById(projectId);
@@ -67,23 +68,31 @@ public class ProjectsController {
         }
 
         Projects existingProject = projectOpt.get();
-        if (updatedProject.getProjectName() != null) existingProject.setProjectName(updatedProject.getProjectName());
-        if (updatedProject.getProjectDescription() != null) existingProject.setProjectDescription(updatedProject.getProjectDescription());
-        if (updatedProject.getProjectDuration() != null) existingProject.setProjectDuration(updatedProject.getProjectDuration());
+
+        // Update fields only if they are explicitly provided (allowing null values)
+        existingProject.setProjectName(updatedProject.getProjectName() != null ? updatedProject.getProjectName() : existingProject.getProjectName());
+        existingProject.setProjectDescription(updatedProject.getProjectDescription() != null ? updatedProject.getProjectDescription() : existingProject.getProjectDescription());
+        existingProject.setProjectDurationFrom(updatedProject.getProjectDurationFrom() != null ? updatedProject.getProjectDurationFrom() : existingProject.getProjectDurationFrom());
+        existingProject.setProjectDurationTo(updatedProject.getProjectDurationTo() != null ? updatedProject.getProjectDurationTo() : existingProject.getProjectDurationTo());
+
+        // Validate dates only if both are provided
+        if (existingProject.getProjectDurationFrom() != null && existingProject.getProjectDurationTo() != null &&
+                existingProject.getProjectDurationFrom().isAfter(existingProject.getProjectDurationTo())) {
+            return ResponseEntity.badRequest().body("Project start date cannot be after end date.");
+        }
 
         Projects savedProject = projectsRepo.save(existingProject);
         return ResponseEntity.ok(savedProject);
     }
 
-    // ✅ 5️⃣ Delete a Project by ID
+
+    // ✅ 5️⃣ Delete Project
     @DeleteMapping("/delete/{projectId}")
     public ResponseEntity<?> deleteProject(@PathVariable String projectId) {
         Optional<Projects> projectOpt = projectsRepo.findById(projectId);
-
         if (projectOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Project not found.");
         }
-
         projectsRepo.deleteById(projectId);
         return ResponseEntity.ok("Project deleted successfully.");
     }

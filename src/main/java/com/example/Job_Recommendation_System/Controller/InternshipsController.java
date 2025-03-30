@@ -4,6 +4,7 @@ import com.example.Job_Recommendation_System.Entity.CareerPreferences;
 import com.example.Job_Recommendation_System.Entity.Internships;
 import com.example.Job_Recommendation_System.Repository.CareerPreferencesRepo;
 import com.example.Job_Recommendation_System.Repository.InternshipsRepo;
+import com.example.Job_Recommendation_System.Service.InternshipsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,9 @@ public class InternshipsController {
 
     @Autowired
     private CareerPreferencesRepo careerPreferencesRepo;
+
+    @Autowired
+    private InternshipsService internshipsService;
 
     // ✅ 1️⃣ Add Internship to a Career Preferences Record
     @PostMapping("/add/{careerPreferencesId}")
@@ -48,26 +52,22 @@ public class InternshipsController {
         return ResponseEntity.ok(internships);
     }
 
-    // ✅ 3️⃣ Update Internship Details
+    // ✅ Update Internship Details
     @PutMapping("/update/{internshipId}")
     public ResponseEntity<?> updateInternship(@PathVariable String internshipId, @RequestBody Internships updatedInternship) {
-        Optional<Internships> internshipOpt = internshipsRepo.findById(internshipId);
+        try {
+            Optional<Internships> updated = internshipsService.updateInternship(internshipId, updatedInternship);
 
-        if (internshipOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Internship record not found.");
+            if (updated.isEmpty()) {
+                return ResponseEntity.badRequest().body("Internship record not found.");  // ✅ Keep this as a String response
+            }
+
+            return ResponseEntity.ok(updated.get()); // ✅ Successfully return Internship object
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // ✅ Error as String
         }
-
-        Internships existingInternship = internshipOpt.get();
-
-        // Update fields if provided
-        if (updatedInternship.getCompanyName() != null) existingInternship.setCompanyName(updatedInternship.getCompanyName());
-        if (updatedInternship.getDurationFrom() != null) existingInternship.setDurationFrom(updatedInternship.getDurationFrom());
-        if (updatedInternship.getDurationTo() != null) existingInternship.setDurationTo(updatedInternship.getDurationTo());
-        if (updatedInternship.getDescription() != null) existingInternship.setDescription(updatedInternship.getDescription());
-
-        Internships savedInternship = internshipsRepo.save(existingInternship);
-        return ResponseEntity.ok(savedInternship);
     }
+
 
     // ✅ 4️⃣ Delete Internship
     @DeleteMapping("/delete/{internshipId}")

@@ -2,6 +2,7 @@ package com.example.Job_Recommendation_System.Controller;
 
 import com.example.Job_Recommendation_System.Entity.Education;
 import com.example.Job_Recommendation_System.Repository.EducationRepo;
+import com.example.Job_Recommendation_System.Service.EducationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import java.util.Optional;
 public class EducationController {
     @Autowired
     private EducationRepo educationRepo;
+    @Autowired
+    private EducationService educationService;
 
     @PostMapping("/addEducation")
     public ResponseEntity<?> createEducation() {
@@ -27,5 +30,16 @@ public class EducationController {
             return ResponseEntity.badRequest().body("Education record not found.");
         }
         return ResponseEntity.ok(educationOpt.get());
+    }
+
+    @PutMapping("/update/{educationId}")
+    public ResponseEntity<?> updateEducation(@PathVariable String educationId, @RequestBody Education updatedEducation) {
+        Optional<Education> updated = educationService.updateEducation(educationId, updatedEducation);
+
+        if (updated.isPresent()) {
+            return ResponseEntity.ok(updated.get());
+        } else {
+            return ResponseEntity.badRequest().body("Education record not found.");
+        }
     }
 }

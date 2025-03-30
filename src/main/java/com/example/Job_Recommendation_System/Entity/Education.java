@@ -1,11 +1,9 @@
 package com.example.Job_Recommendation_System.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 @Entity
@@ -17,20 +15,20 @@ public class Education {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String education_id;
 
-    @OneToMany(mappedBy = "education",cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "education", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Degree> degrees;
 
-    @OneToOne(mappedBy = "education", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private Class12 class12;
+    @OneToOne(mappedBy = "education", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Class10 class10;  // ✅ Fixed: Uses Class10 type
 
-    @OneToOne(mappedBy = "education", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private Class12 class10;
+    @OneToOne(mappedBy = "education", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Class12 class12;  // ✅ Fixed: Uses Class12 type
 
     @OneToOne(mappedBy = "education", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonBackReference
     private CareerPreferences careerPreferences;
 
-
+    // Getters and Setters
     public CareerPreferences getCareerPreferences() {
         return careerPreferences;
     }
@@ -39,11 +37,11 @@ public class Education {
         this.careerPreferences = careerPreferences;
     }
 
-    public Class12 getClass10() {
+    public Class10 getClass10() {
         return class10;
     }
 
-    public void setClass10(Class12 class10) {
+    public void setClass10(Class10 class10) {
         this.class10 = class10;
     }
 

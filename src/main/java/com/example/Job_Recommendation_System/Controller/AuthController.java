@@ -64,6 +64,10 @@ public class AuthController {
     private DegreeRepo degreeRepo;
     @Autowired
     private CareerPreferencesRepo careerPreferencesRepo;
+    @Autowired
+    private InternshipsRepo internshipsRepo;
+    @Autowired
+    private ProjectsRepo projectsRepo;
 
 //@PostMapping("/register")
 //public ResponseEntity<Map<String, String>> registerUser(@RequestBody Users user) {
@@ -125,6 +129,15 @@ public class AuthController {
         class10Repo.save(new Class10(education));
         class12Repo.save(new Class12(education));
         degreeRepo.save(new Degree(education));
+
+        // ✅ Create empty Internship and Project records linked to CareerPreferences
+        Internships internship = new Internships();
+        internship.setCareerPreferences(careerPreferences);
+        internshipsRepo.save(internship);
+
+        Projects project = new Projects();
+        project.setCareerPreferences(careerPreferences);
+        projectsRepo.save(project);
 
         response.put("message", "User registered successfully!");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

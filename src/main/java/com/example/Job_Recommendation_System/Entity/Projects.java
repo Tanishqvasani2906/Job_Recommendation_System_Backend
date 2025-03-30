@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "projects")
 @AllArgsConstructor
@@ -17,8 +20,14 @@ public class Projects {
     private String projectName;
     @Column(name = "project_description")
     private String projectDescription;
-    @Column(name = "project_duration")
-    private String projectDuration;
+//    @Column(name = "project_duration")
+//    private String projectDuration;
+    @Column(name = "project_duration_from")
+    private LocalDate projectDurationFrom;
+
+    @Column(name = "project_duration_to")
+    private LocalDate projectDurationTo;
+
 
     @ManyToOne
     @JoinColumn(name = "careerPreferences_id")
@@ -41,12 +50,20 @@ public class Projects {
         this.projectDescription = projectDescription;
     }
 
-    public String getProjectDuration() {
-        return projectDuration;
+    public LocalDate getProjectDurationFrom() {
+        return projectDurationFrom;
     }
 
-    public void setProjectDuration(String projectDuration) {
-        this.projectDuration = projectDuration;
+    public void setProjectDurationFrom(LocalDate projectDurationFrom) {
+        this.projectDurationFrom = projectDurationFrom;
+    }
+
+    public LocalDate getProjectDurationTo() {
+        return projectDurationTo;
+    }
+
+    public void setProjectDurationTo(LocalDate projectDurationTo) {
+        this.projectDurationTo = projectDurationTo;
     }
 
     public String getProjectName() {
