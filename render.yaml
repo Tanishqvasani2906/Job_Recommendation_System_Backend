@@ -1,7 +1,7 @@
 services:
   - type: web
     name: job-recommendation-backend
-    env: java
+    env: docker
     repo: https://github.com/Tanishqvasani2906/Job_Recommendation_System_Backend
     branch: main
     region: frankfurt
