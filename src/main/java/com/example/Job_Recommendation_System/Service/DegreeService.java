@@ -29,6 +29,12 @@ public class DegreeService {
             if (updatedDegree.getCourseDurationTo() != null || updatedDegree.getCourseDurationTo() == null) {
                 existingDegree.setCourseDurationTo(updatedDegree.getCourseDurationTo());
             }
+            if(updatedDegree.getCourseType()!=null || updatedDegree.getCourseType()==null){
+                existingDegree.setCourseType(updatedDegree.getCourseType());
+            }
+            if(updatedDegree.getUniversityName()!=null || updatedDegree.getUniversityName()==null){
+                existingDegree.setUniversityName(updatedDegree.getUniversityName());
+            }
 
             return Optional.of(degreeRepo.save(existingDegree));
         }).or(() -> Optional.empty());

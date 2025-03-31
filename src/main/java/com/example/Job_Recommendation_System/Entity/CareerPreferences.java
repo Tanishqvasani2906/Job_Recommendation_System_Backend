@@ -31,6 +31,8 @@ public class CareerPreferences {
     private String language;
     @Column(name = "resume_url")  // ✅ New field for storing resume URL
     private String resumeUrl;
+    @Column(name = "avilablity_to_work")
+    private String avilablityToWork;
 
     @OneToOne
     @JoinColumn(name = "user_id",unique = true, nullable = false)
@@ -129,6 +131,14 @@ public class CareerPreferences {
 
     public String getResumeUrl() {
         return resumeUrl;
+    }
+
+    public String getAvilablityToWork() {
+        return avilablityToWork;
+    }
+
+    public void setAvilablityToWork(String avilablityToWork) {
+        this.avilablityToWork = avilablityToWork;
     }
 
     public void setResumeUrl(String resumeUrl) {

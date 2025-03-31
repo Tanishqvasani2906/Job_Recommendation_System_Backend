@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "degree")
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 public class Degree {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -20,6 +20,8 @@ public class Degree {
     private String CGPA;
     private LocalDate courseDurationFrom;
     private LocalDate courseDurationTo;
+    private String courseType;
+    private String universityName;
 
     @ManyToOne
     @JoinColumn(name = "education_id")
@@ -28,6 +30,9 @@ public class Degree {
 
     public Degree(Education education) {
         this.education=education;
+    }
+    public Degree(){
+
     }
 
     public Education getEducation() {
@@ -84,5 +89,21 @@ public class Degree {
 
     public void setDegreeName(String degreeName) {
         this.degreeName = degreeName;
+    }
+
+    public String getCourseType() {
+        return courseType;
+    }
+
+    public void setCourseType(String courseType) {
+        this.courseType = courseType;
+    }
+
+    public String getUniversityName() {
+        return universityName;
+    }
+
+    public void setUniversityName(String universityName) {
+        this.universityName = universityName;
     }
 }

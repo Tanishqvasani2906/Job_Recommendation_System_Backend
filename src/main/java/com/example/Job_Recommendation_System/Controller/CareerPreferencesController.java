@@ -117,6 +117,7 @@ public class CareerPreferencesController {
         Optional.ofNullable(updatedPreferences.getKeySkills()).ifPresent(existingPreferences::setKeySkills);
         Optional.ofNullable(updatedPreferences.getLanguage()).ifPresent(existingPreferences::setLanguage);
         Optional.ofNullable(updatedPreferences.getResumeUrl()).ifPresent(existingPreferences::setResumeUrl);
+        Optional.ofNullable(updatedPreferences.getAvilablityToWork()).ifPresent(existingPreferences::setAvilablityToWork);
 
         CareerPreferences savedPreferences = careerPreferencesRepo.save(existingPreferences);
         return ResponseEntity.ok(savedPreferences);
