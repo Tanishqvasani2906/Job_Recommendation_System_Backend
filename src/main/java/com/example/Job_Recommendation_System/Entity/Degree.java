@@ -9,8 +9,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "degree")
-@AllArgsConstructor
-@NoArgsConstructor(force = true)
+//@AllArgsConstructor
+//@NoArgsConstructor(force = true)
 public class Degree {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
