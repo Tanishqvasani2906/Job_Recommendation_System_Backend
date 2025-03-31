@@ -6,8 +6,7 @@ services:
     branch: main
     region: frankfurt
 
-    buildCommand: ./mvnw clean package
-    startCommand: java -jar target/*.jar
+    dockerfilePath: ./Dockerfile
 
     healthCheckPath: /actuator/health
     autoDeploy: true
