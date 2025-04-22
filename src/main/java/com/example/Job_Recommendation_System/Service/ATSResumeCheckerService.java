@@ -20,7 +20,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 @Service
 public class ATSResumeCheckerService {
 
-    private static final String API_KEY = "AIzaSyAYByRRmlGGPeIr7ePePfN8jKv0qiH26I4";
+    private static final String API_KEY = "AIzaSyDSMwAXEPn5XRq0imEILpzKGwU6tHhimjU";
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
 
     public ResponseEntity<?> checkGeneralATSScore(ResumeUploadDTO resumeUploadDTO) {
@@ -51,6 +51,13 @@ Perform a **strict and realistic ATS compatibility analysis** on the given resum
 - **Do not average scores across categories.** Each section should be **scored independently** based on strict ATS compliance.
 
 ---
+### **🔹 Strict Resume Validation (Experience Requirement)**
+- If the resume **does not contain a section titled "Experience"**, return the following error message:
+  ```json
+  {
+    "error": "This document is not a resume. A resume must include an experience section."
+  }
+
 
 ### **🔹 Key Evaluation Areas (Updated for More Precision)**
 
