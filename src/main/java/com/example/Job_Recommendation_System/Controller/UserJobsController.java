@@ -93,6 +93,19 @@ public class UserJobsController {
             newJob.setUpdatedAt(LocalDateTime.now());
             newJob.setJobType(jobRequest.getJobType());
             newJob.setSalary(jobRequest.getSalary());
+
+            newJob.setAskCertifications(jobRequest.isAskCertifications());
+            newJob.setAskGitHub(jobRequest.isAskGitHub());
+            newJob.setAskCareerGoals(jobRequest.isAskCareerGoals());
+            newJob.setAskProjects(jobRequest.isAskProjects());
+            newJob.setAskYearsExperience(jobRequest.isAskYearsExperience());
+            newJob.setAskRoleInterest(jobRequest.isAskRoleInterest());
+            newJob.setAskProblemSolving(jobRequest.isAskProblemSolving());
+            newJob.setAskTeamworkExperience(jobRequest.isAskTeamworkExperience());
+            newJob.setAskRemoteSetup(jobRequest.isAskRemoteSetup());
+            newJob.setAskSalaryExpectation(jobRequest.isAskSalaryExpectation());
+            newJob.setAskLearningGoal(jobRequest.isAskLearningGoal());
+            newJob.setAskOpenSourceContribution(jobRequest.isAskOpenSourceContribution());
             newJob.setUser(currentUser); // Set the user
 
             UserJobs savedJob = jobsService.saveNewJobs(newJob);

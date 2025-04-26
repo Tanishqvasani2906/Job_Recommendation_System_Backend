@@ -40,6 +40,21 @@ public class UserJobs {
     @JoinColumn(name = "user_id", nullable = false)
     private Users users;
 
+    @Column private boolean askTechStack;
+    @Column private boolean askGitHub;
+    @Column private boolean askProjects;
+    @Column private boolean askYearsExperience;
+    @Column private boolean askCertifications;
+    @Column private boolean askRoleInterest;
+    @Column private boolean askProblemSolving;
+    @Column private boolean askTeamworkExperience;
+    @Column private boolean askRemoteSetup;
+    @Column private boolean askSalaryExpectation;
+    @Column private boolean askLearningGoal;
+    @Column private boolean askCareerGoals;
+    @Column private boolean askOpenSourceContribution;
+
+
     public Users getUser() {
         return users;
     }
@@ -143,4 +158,115 @@ public class UserJobs {
         this.salary = salary;
     }
 
+    public boolean isAskCareerGoals() {
+        return askCareerGoals;
+    }
+
+    public void setAskCareerGoals(boolean askCareerGoals) {
+        this.askCareerGoals = askCareerGoals;
+    }
+
+    public boolean isAskCertifications() {
+        return askCertifications;
+    }
+
+    public void setAskCertifications(boolean askCertifications) {
+        this.askCertifications = askCertifications;
+    }
+
+    public boolean isAskGitHub() {
+        return askGitHub;
+    }
+
+    public void setAskGitHub(boolean askGitHub) {
+        this.askGitHub = askGitHub;
+    }
+
+    public boolean isAskLearningGoal() {
+        return askLearningGoal;
+    }
+
+    public void setAskLearningGoal(boolean askLearningGoal) {
+        this.askLearningGoal = askLearningGoal;
+    }
+
+    public boolean isAskOpenSourceContribution() {
+        return askOpenSourceContribution;
+    }
+
+    public void setAskOpenSourceContribution(boolean askOpenSourceContribution) {
+        this.askOpenSourceContribution = askOpenSourceContribution;
+    }
+
+    public boolean isAskProblemSolving() {
+        return askProblemSolving;
+    }
+
+    public void setAskProblemSolving(boolean askProblemSolving) {
+        this.askProblemSolving = askProblemSolving;
+    }
+
+    public boolean isAskProjects() {
+        return askProjects;
+    }
+
+    public void setAskProjects(boolean askProjects) {
+        this.askProjects = askProjects;
+    }
+
+    public boolean isAskRemoteSetup() {
+        return askRemoteSetup;
+    }
+
+    public void setAskRemoteSetup(boolean askRemoteSetup) {
+        this.askRemoteSetup = askRemoteSetup;
+    }
+
+    public boolean isAskRoleInterest() {
+        return askRoleInterest;
+    }
+
+    public void setAskRoleInterest(boolean askRoleInterest) {
+        this.askRoleInterest = askRoleInterest;
+    }
+
+    public boolean isAskSalaryExpectation() {
+        return askSalaryExpectation;
+    }
+
+    public void setAskSalaryExpectation(boolean askSalaryExpectation) {
+        this.askSalaryExpectation = askSalaryExpectation;
+    }
+
+    public boolean isAskTeamworkExperience() {
+        return askTeamworkExperience;
+    }
+
+    public void setAskTeamworkExperience(boolean askTeamworkExperience) {
+        this.askTeamworkExperience = askTeamworkExperience;
+    }
+
+    public boolean isAskTechStack() {
+        return askTechStack;
+    }
+
+    public void setAskTechStack(boolean askTechStack) {
+        this.askTechStack = askTechStack;
+    }
+
+    public boolean isAskYearsExperience() {
+        return askYearsExperience;
+    }
+
+    public void setAskYearsExperience(boolean askYearsExperience) {
+        this.askYearsExperience = askYearsExperience;
+    }
+
+    public Users getUsers() {
+        return users;
+    }
+
+    public void setUsers(Users users) {
+        this.users = users;
+    }
 }

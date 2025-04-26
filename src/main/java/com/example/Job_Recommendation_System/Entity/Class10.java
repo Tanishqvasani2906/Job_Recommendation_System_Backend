@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "class10")
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 public class Class10 {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,6 +26,9 @@ public class Class10 {
 
     public Class10(Education education) {
         this.education = education;
+    }
+
+    public Class10() {
     }
 
     public String getBoard() {
