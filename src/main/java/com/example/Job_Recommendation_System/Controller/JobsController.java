@@ -9,6 +9,11 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 
 import java.util.List;
 
@@ -23,11 +28,21 @@ public class JobsController {
     private JobUpdateService jobUpdateService;
 
     @Cacheable(value = "jobsCache")
+//    @GetMapping(produces = "application/json")
+//    public ResponseEntity<List<Jobs>> getAllJobs() {
+//        List<Jobs> list = jobRepo.findAll();
+//        return ResponseEntity.ok(list);
+//    }
     @GetMapping(produces = "application/json")
-    public ResponseEntity<List<Jobs>> getAllJobs() {
-        List<Jobs> list = jobRepo.findAll();
-        return ResponseEntity.ok(list);
+    public ResponseEntity<Page<Jobs>> getAllJobsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
+        Page<Jobs> jobPage = jobRepo.findAll(pageable);
+        return ResponseEntity.ok(jobPage);
     }
+
 
     @PostMapping("/insert")
     public void insertJobs(@RequestBody List<Jobs> jobs) {
