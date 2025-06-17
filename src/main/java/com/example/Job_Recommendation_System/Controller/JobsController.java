@@ -35,7 +35,7 @@ public class JobsController {
 //    }
     @GetMapping(produces = "application/json")
     public ResponseEntity<Page<Jobs>> getAllJobsPaginated(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
