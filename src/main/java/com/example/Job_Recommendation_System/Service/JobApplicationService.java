@@ -193,7 +193,6 @@ public class JobApplicationService {
         // Save updated application
         JobApplication updatedApplication = jobApplicationRepo.save(application);
 
-        // Now map it to ResponseDTO
         JobApplicationResponseDTO responseDTO = new JobApplicationResponseDTO();
         responseDTO.setApplicationId(updatedApplication.getApplicationId());
         responseDTO.setStatus(updatedApplication.getStatus());

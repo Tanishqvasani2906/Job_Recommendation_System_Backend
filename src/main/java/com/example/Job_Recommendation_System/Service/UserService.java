@@ -45,7 +45,6 @@ public class UserService {
 
         Users user = userOptional.get();
 
-        // Generate a temporary token
         String tempToken = Jwts.builder()
                 .setSubject(user.getUser_id())
                 .setIssuedAt(new Date())
