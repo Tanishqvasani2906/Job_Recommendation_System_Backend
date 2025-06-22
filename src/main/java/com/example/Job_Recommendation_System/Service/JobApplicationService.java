@@ -88,19 +88,15 @@ public class JobApplicationService {
         responseDTO.setApplicationId(savedApplication.getApplicationId());
         responseDTO.setJobTitle(job.getTitle());
         responseDTO.setCompanyName(job.getCompanyName());
-        responseDTO.setApplicantName(user.getFirstName()); // assuming your Users entity has a getFullName() method
+        responseDTO.setApplicantName(user.getFirstName());
         responseDTO.setAppliedAt(savedApplication.getAppliedAt());
         responseDTO.setStatus(savedApplication.getStatus());
 
-        // If needed, set responses back (optional)
         responseDTO.setResponses(dto.getAnswers());
 
         return responseDTO;
     }
 
-
-
-    // 1️⃣ Get all applications for a specific user
     public List<JobApplicationResponseDTO> getApplicationsByUser(String userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

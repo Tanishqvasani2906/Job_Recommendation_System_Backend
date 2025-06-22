@@ -27,7 +27,7 @@ public class JobsController {
     @Autowired
     private JobUpdateService jobUpdateService;
 
-    @Cacheable(value = "jobsCache")
+//    @Cacheable(value = "jobsCache")
 //    @GetMapping(produces = "application/json")
 //    public ResponseEntity<List<Jobs>> getAllJobs() {
 //        List<Jobs> list = jobRepo.findAll();
