@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -41,6 +42,14 @@ public class JobsController {
         Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
         Page<Jobs> jobPage = jobRepo.findAll(pageable);
         return ResponseEntity.ok(jobPage);
+    }
+
+    @GetMapping("/getRelatedJobs")
+    public ResponseEntity<List<Jobs>> getAllJobs(@RequestParam List<String> tags) {
+        // Convert ["java", "php"] → "java|php"
+        String regexTags = String.join("|", tags).toLowerCase();
+        List<Jobs> jobsList = jobRepo.findByMatchingTags(regexTags);
+        return ResponseEntity.ok(jobsList);
     }
 
 

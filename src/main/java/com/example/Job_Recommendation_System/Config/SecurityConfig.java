@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 .requestMatchers("/userlogin/auth/google/callback").permitAll()
                                 .requestMatchers("/api/jobs/ping").permitAll()
                                 .requestMatchers("/jobtype/upload","/jobtype").permitAll()
+                                .requestMatchers("/api/jobs/getRelatedJobs").permitAll()
 //                        .requestMatchers("/api/jobs/post/new").hasAnyRole("COMPANY", "ADMIN")
                         .anyRequest().authenticated()
                 )

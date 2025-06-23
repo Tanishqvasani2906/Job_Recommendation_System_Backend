@@ -14,9 +14,9 @@ import java.util.List;
 
 @Repository
 public interface JobRepo extends JpaRepository<Jobs, String> {
-
-
-
-
     Jobs findByUrl(String url);
+
+    @Query(value = "SELECT * FROM jobs j WHERE " +
+            "LOWER(j.tags) SIMILAR TO CONCAT('%(', :tags, ')%')", nativeQuery = true)
+    List<Jobs> findByMatchingTags(@Param("tags") String tags);
 }
