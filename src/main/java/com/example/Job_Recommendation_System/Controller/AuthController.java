@@ -286,7 +286,7 @@ public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
             params.add("client_id", "1066158005621-5ecafgah1sc3pfpmvorf1k5ehjvoouas.apps.googleusercontent.com");
             params.add("client_secret", "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");
 //            params.add("redirect_uri", "https://job-recommendation-system-backend.onrender.com/userlogin/auth/google/callback");
-            params.add("redirect_uri", "https://job-recommendation-system-backend-6caq.onrender.com/userlogin/auth/google/callback");
+            params.add("redirect_uri", "https://job-recommendation-system-backend.onrender.com/userlogin/auth/google/callback");
             params.add("grant_type", "authorization_code");
 
             HttpHeaders headers = new HttpHeaders();
