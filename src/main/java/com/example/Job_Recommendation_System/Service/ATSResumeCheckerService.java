@@ -2,6 +2,7 @@ package com.example.Job_Recommendation_System.Service;
 
 import com.example.Job_Recommendation_System.Dto.ResumeUploadDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,9 +21,13 @@ import org.apache.pdfbox.text.PDFTextStripper;
 @Service
 public class ATSResumeCheckerService {
 
-    private static final String API_KEY = "AIzaSyDSMwAXEPn5XRq0imEILpzKGwU6tHhimjU";
-    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+//    """GEMINI INTEGRATION FOR THE ATS SCORE CHECK"""
+//    private static final String API_KEY = "";
+//    private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite-001:generateContent?key=" + API_KEY;
 
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String API_KEY = dotenv.get("API_KEY");
+    private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
     public ResponseEntity<?> checkGeneralATSScore(ResumeUploadDTO resumeUploadDTO) {
         String resumeText;
 
@@ -42,6 +47,10 @@ public class ATSResumeCheckerService {
 
             // Optimized structured prompt for Gemini API
             String prompt = """
+                    You must return ONLY valid JSON.\s
+                    Do not include explanations, markdown, or text outside JSON.
+                    
+                    Return response strictly in JSON format.
 Perform a **strict and realistic ATS compatibility analysis** on the given resume based on industry-leading standards, including [Resume Worded](https://resumeworded.com) and [Enhancv](https://enhancv.com). 
 
 ### **🔹 Updated Scoring Criteria (STRICTER)**
@@ -150,12 +159,28 @@ Perform a **strict and realistic ATS compatibility analysis** on the given resum
 
             // Construct request body
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("contents", new Object[]{
-                    Map.of("role", "user", "parts", new Object[]{Map.of("text", prompt)})
-            });
+//            requestBody.put("contents", new Object[]{
+//                    Map.of("role", "user", "parts", new Object[]{Map.of("text", prompt)})
+//            });
+            requestBody.put("model", resumeUploadDTO.getModel() != null
+                    ? resumeUploadDTO.getModel()
+                    : "llama-3.1-8b-instant");
+
+            List<Map<String, String>> messages = new ArrayList<>();
+
+            Map<String, String> message = new HashMap<>();
+            message.put("role", "user");
+            message.put("content", prompt);
+
+            messages.add(message);
+
+            requestBody.put("messages", messages);
+            // FORCEFUL JSON RESPONSE AFTER GROK
+            requestBody.put("response_format", Map.of("type", "json_object"));
 
             // Set HTTP headers
             HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + API_KEY);
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             // Send request to Gemini API
@@ -170,44 +195,66 @@ Perform a **strict and realistic ATS compatibility analysis** on the given resum
         }
     }
 
+//    GEMINI RESPONSE FORMAT
 
+//    private ResponseEntity<?> formatResponse(Map<String, Object> responseBody) {
+//        try {
+//            if (!responseBody.containsKey("candidates")) {
+//                return ResponseEntity.badRequest().body("Invalid response format from Gemini API.");
+//            }
+//
+//            List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
+//            if (candidates.isEmpty()) {
+//                return ResponseEntity.badRequest().body("No valid response from Gemini API.");
+//            }
+//
+//            Map<String, Object> firstCandidate = candidates.get(0);
+//            if (!firstCandidate.containsKey("content")) {
+//                return ResponseEntity.badRequest().body("Missing 'content' in response.");
+//            }
+//
+//            Map<String, Object> content = (Map<String, Object>) firstCandidate.get("content");
+//
+//            if (!content.containsKey("parts")) {
+//                return ResponseEntity.badRequest().body("Missing 'parts' in response.");
+//            }
+//
+//            List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
+//            if (parts.isEmpty() || !parts.get(0).containsKey("text")) {
+//                return ResponseEntity.badRequest().body("No text response received.");
+//            }
+//
+//            // Get the raw text response from Gemini
+//            String rawResponseText = (String) parts.get(0).get("text");
+//
+//            // Try to extract structured JSON from text
+//            Map<String, Object> structuredResponse = extractJsonFromText(rawResponseText);
+//
+//            return ResponseEntity.ok(structuredResponse);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Error formatting response: " + e.getMessage());
+//        }
+//    }
+
+//    GROQ RESPONSE FORMAT
     private ResponseEntity<?> formatResponse(Map<String, Object> responseBody) {
         try {
-            if (!responseBody.containsKey("candidates")) {
-                return ResponseEntity.badRequest().body("Invalid response format from Gemini API.");
-            }
+            List<Map<String, Object>> choices =
+                    (List<Map<String, Object>>) responseBody.get("choices");
 
-            List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
-            if (candidates.isEmpty()) {
-                return ResponseEntity.badRequest().body("No valid response from Gemini API.");
-            }
+            Map<String, Object> message =
+                    (Map<String, Object>) choices.get(0).get("message");
 
-            Map<String, Object> firstCandidate = candidates.get(0);
-            if (!firstCandidate.containsKey("content")) {
-                return ResponseEntity.badRequest().body("Missing 'content' in response.");
-            }
+            String content = (String) message.get("content");
 
-            Map<String, Object> content = (Map<String, Object>) firstCandidate.get("content");
-
-            if (!content.containsKey("parts")) {
-                return ResponseEntity.badRequest().body("Missing 'parts' in response.");
-            }
-
-            List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
-            if (parts.isEmpty() || !parts.get(0).containsKey("text")) {
-                return ResponseEntity.badRequest().body("No text response received.");
-            }
-
-            // Get the raw text response from Gemini
-            String rawResponseText = (String) parts.get(0).get("text");
-
-            // Try to extract structured JSON from text
-            Map<String, Object> structuredResponse = extractJsonFromText(rawResponseText);
+            Map<String, Object> structuredResponse = extractJsonFromText(content);
 
             return ResponseEntity.ok(structuredResponse);
 
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error formatting response: " + e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body("Error formatting response: " + e.getMessage());
         }
     }
 

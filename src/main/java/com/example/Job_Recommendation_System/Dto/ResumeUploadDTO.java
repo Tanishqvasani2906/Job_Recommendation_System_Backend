@@ -10,6 +10,7 @@ import lombok.*;
 public class ResumeUploadDTO {
     private String resumeText;
     private String firebasePdfUrl;
+    private String model;
     public String getResumeText() {
         return resumeText;
     }
@@ -24,5 +25,13 @@ public class ResumeUploadDTO {
 
     public void setFirebasePdfUrl(String firebasePdfUrl) {
         this.firebasePdfUrl = firebasePdfUrl;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
     }
 }
