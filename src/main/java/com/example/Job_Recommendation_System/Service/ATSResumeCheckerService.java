@@ -3,6 +3,7 @@ package com.example.Job_Recommendation_System.Service;
 import com.example.Job_Recommendation_System.Dto.ResumeUploadDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +27,9 @@ public class ATSResumeCheckerService {
 //    private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite-001:generateContent?key=" + API_KEY;
 
     private static final Dotenv dotenv = Dotenv.load();
-    private static final String API_KEY = dotenv.get("API_KEY");
+//    private static final String API_KEY = dotenv.get("API_KEY");
+    @Value("${api.key}")
+    private String API_KEY;
     private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
     public ResponseEntity<?> checkGeneralATSScore(ResumeUploadDTO resumeUploadDTO) {
         String resumeText;
