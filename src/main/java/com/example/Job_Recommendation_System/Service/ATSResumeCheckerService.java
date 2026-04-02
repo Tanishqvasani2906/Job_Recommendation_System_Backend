@@ -26,7 +26,7 @@ public class ATSResumeCheckerService {
 //    private static final String API_KEY = "";
 //    private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite-001:generateContent?key=" + API_KEY;
 
-    private static final Dotenv dotenv = Dotenv.load();
+//    private static final Dotenv dotenv = Dotenv.load();
 //    private static final String API_KEY = dotenv.get("API_KEY");
     @Value("${api.key}")
     private String API_KEY;
